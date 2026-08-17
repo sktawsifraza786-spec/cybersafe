@@ -1,71 +1,141 @@
 function checkURL() {
 
-    const url = document.getElementById("urlInput").value.trim();
+    const input =
+        document.getElementById("urlInput").value.trim();
 
-    if (url === "") {
-        document.getElementById("result").innerHTML =
-            "Please enter a URL.";
+    const result =
+        document.getElementById("result");
+
+    if (input === "") {
+        result.innerHTML =
+            "<p>Please enter a URL.</p>";
         return;
     }
 
     let score = 0;
     let reasons = [];
 
-    // Check HTTPS
-    if (!url.startsWith("https://")) {
+    // HTTPS check
+    if (!input.startsWith("https://")) {
+
         score += 20;
-        reasons.push("URL does not use HTTPS.");
+
+        reasons.push(
+            "URL does not use HTTPS."
+        );
     }
 
-    // Check IP address
+    // IP address check
     const ipPattern =
-        /https?:\/\/(\d{1,3}\.){3}\d{1,3}/;
+        /^https?:\/\/(\d{1,3}\.){3}\d{1,3}/;
 
-    if (ipPattern.test(url)) {
+    if (ipPattern.test(input)) {
+
         score += 30;
-        reasons.push("URL uses an IP address.");
+
+        reasons.push(
+            "URL uses an IP address instead of a domain name."
+        );
     }
 
-    // Check @ symbol
-    if (url.includes("@")) {
+    // @ symbol
+    if (input.includes("@")) {
+
         score += 20;
-        reasons.push("URL contains @ symbol.");
+
+        reasons.push(
+            "URL contains an @ symbol."
+        );
     }
 
-    // Check suspicious characters
-    if (url.includes("-")) {
+    // Very long URL
+    if (input.length > 100) {
+
         score += 10;
-        reasons.push("URL contains a hyphen.");
+
+        reasons.push(
+            "URL is unusually long."
+        );
     }
 
-    // Check excessive length
-    if (url.length > 75) {
-        score += 20;
-        reasons.push("URL is unusually long.");
+    // Suspicious keywords
+    const suspiciousWords = [
+        "login",
+        "verify",
+        "password",
+        "account",
+        "update",
+        "free"
+    ];
+
+    let foundKeyword = false;
+
+    for (const word of suspiciousWords) {
+
+        if (input.toLowerCase().includes(word)) {
+
+            foundKeyword = true;
+            break;
+        }
     }
+
+    if (foundKeyword) {
+
+        score += 10;
+
+        reasons.push(
+            "URL contains a potentially suspicious keyword."
+        );
+    }
+
+    // Maximum score = 100
+    score = Math.min(score, 100);
 
     let status;
 
-    if (score >= 50) {
-        status = "⚠️ Suspicious URL";
+    if (score < 30) {
+
+        status = "🟢 Likely Safe";
+
+    } else if (score < 60) {
+
+        status = "🟡 Suspicious";
+
     } else {
-        status = "✅ Likely Safe";
+
+        status = "🔴 High Risk";
     }
 
-    let output = `
-        <h2>${status}</h2>
-        <p>Risk Score: ${score}/100</p>
-    `;
+    let reasonHTML = "";
 
-    if (reasons.length > 0) {
-        output += "<p><b>Reasons:</b></p><ul>";
+    if (reasons.length === 0) {
 
-        reasons.forEach(function(reason) {
-            output += `<li>${reason}</li>`;
+        reasonHTML =
+            "<p>No obvious suspicious signs detected.</p>";
+
+    } else {
+
+        reasonHTML = "<ul>";
+
+        reasons.forEach(reason => {
+
+            reasonHTML +=
+                `<li>${reason}</li>`;
+
         });
 
-        output += "</ul>";
+        reasonHTML += "</ul>";
     }
 
-    document.getElementById("result").innerHTML = output;
+    result.innerHTML = `
+        <div class="result-box">
+
+            <h2>${status}</h2>
+
+            <h3>Risk Score: ${score}/100</h3>
+
+            ${reasonHTML}
+
+        </div>
+    `;
 }

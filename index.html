@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>CyberSafe - URL Checker</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,15 +18,23 @@
 
         <h1>🛡️ CyberSafe</h1>
 
-        <p>Check a URL for basic suspicious signs.</p>
+        <p>
+            Check a URL for basic suspicious signs.
+        </p>
 
-        <input
-            type="text"
-            id="urlInput"
-            placeholder="Enter URL here..."
-        >
+        <div class="checker">
 
-        <button onclick="checkURL()">Check URL</button>
+            <input
+                type="text"
+                id="urlInput"
+                placeholder="Enter URL here..."
+            >
+
+            <button onclick="checkURL()">
+                Check URL
+            </button>
+
+        </div>
 
         <div id="result"></div>
 
