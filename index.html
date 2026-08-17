@@ -15,7 +15,91 @@
 <body>
 
     <div class="container">
+a<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSafe - URL Security Checker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+    <header>
+        <div class="logo">🛡️ CyberSafe</div>
+        <p>Basic URL Security & Risk Analyzer</p>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Check a URL Before You Click</h1>
+            <p>
+                Analyze a website URL for basic suspicious signs
+                and get an instant risk assessment.
+            </p>
+
+            <div class="checker">
+                <input
+                    type="text"
+                    id="urlInput"
+                    placeholder="Enter URL here...">
+                <button onclick="checkURL()">Check URL</button>
+            </div>
+
+            <p class="example">
+                Example: https://example.com
+            </p>
+        </section>
+
+        <section id="result" class="result hidden">
+            <h2 id="resultTitle"></h2>
+
+            <div class="score">
+                <span id="riskScore">0</span>/100
+            </div>
+
+            <p id="resultMessage"></p>
+
+            <div id="checks"></div>
+        </section>
+
+        <section class="features">
+            <div class="card">
+                <span>🔒</span>
+                <h3>HTTPS Check</h3>
+                <p>Checks whether the URL uses HTTPS.</p>
+            </div>
+
+            <div class="card">
+                <span>🔍</span>
+                <h3>URL Analysis</h3>
+                <p>Looks for common suspicious URL patterns.</p>
+            </div>
+
+            <div class="card">
+                <span>⚠️</span>
+                <h3>Risk Score</h3>
+                <p>Provides a basic 0–100 risk score.</p>
+            </div>
+        </section>
+
+        <section class="notice">
+            <h3>⚠️ Important</h3>
+            <p>
+                CyberSafe is an educational tool. A "Safe" result does
+                not guarantee that a website is completely safe.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 CyberSafe | Educational Cybersecurity Project</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
         <h1>🛡️ CyberSafe</h1>
 
         <p>

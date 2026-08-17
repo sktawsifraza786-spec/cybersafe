@@ -1,141 +1,163 @@
 function checkURL() {
 
-    const input =
-        document.getElementById("urlInput").value.trim();
+    const input = document.getElementById("urlInput");
+    const result = document.getElementById("result");
 
-    const result =
-        document.getElementById("result");
+    let url = input.value.trim();
 
-    if (input === "") {
-        result.innerHTML =
-            "<p>Please enter a URL.</p>";
+    if (url === "") {
+        alert("Please enter a URL.");
         return;
     }
 
+    if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+    }
+
     let score = 0;
-    let reasons = [];
+    let checks = [];
+
+    let parsedURL;
+
+    try {
+        parsedURL = new URL(url);
+    } catch (error) {
+        showResult(
+            "Invalid URL",
+            100,
+            "The entered text does not appear to be a valid URL.",
+            ["❌ URL format is invalid"]
+        );
+        return;
+    }
 
     // HTTPS check
-    if (!input.startsWith("https://")) {
-
-        score += 20;
-
-        reasons.push(
-            "URL does not use HTTPS."
-        );
+    if (parsedURL.protocol === "https:") {
+        checks.push("✅ HTTPS is enabled");
+    } else {
+        score += 25;
+        checks.push("⚠️ HTTPS is not being used");
     }
 
     // IP address check
     const ipPattern =
-        /^https?:\/\/(\d{1,3}\.){3}\d{1,3}/;
+        /^(?:\d{1,3}\.){3}\d{1,3}$/;
 
-    if (ipPattern.test(input)) {
-
-        score += 30;
-
-        reasons.push(
-            "URL uses an IP address instead of a domain name."
-        );
-    }
-
-    // @ symbol
-    if (input.includes("@")) {
-
-        score += 20;
-
-        reasons.push(
-            "URL contains an @ symbol."
-        );
-    }
-
-    // Very long URL
-    if (input.length > 100) {
-
-        score += 10;
-
-        reasons.push(
-            "URL is unusually long."
-        );
+    if (ipPattern.test(parsedURL.hostname)) {
+        score += 25;
+        checks.push("⚠️ URL uses an IP address instead of a domain");
+    } else {
+        checks.push("✅ Normal domain format detected");
     }
 
     // Suspicious keywords
     const suspiciousWords = [
         "login",
         "verify",
+        "verification",
         "password",
         "account",
+        "secure",
         "update",
-        "free"
+        "bank",
+        "free",
+        "winner"
     ];
 
-    let foundKeyword = false;
+    let foundWords = [];
 
-    for (const word of suspiciousWords) {
-
-        if (input.toLowerCase().includes(word)) {
-
-            foundKeyword = true;
-            break;
+    suspiciousWords.forEach(function(word) {
+        if (url.toLowerCase().includes(word)) {
+            foundWords.push(word);
         }
-    }
+    });
 
-    if (foundKeyword) {
-
-        score += 10;
-
-        reasons.push(
-            "URL contains a potentially suspicious keyword."
+    if (foundWords.length > 0) {
+        score += Math.min(foundWords.length * 8, 30);
+        checks.push(
+            "⚠️ Suspicious keywords detected: " +
+            foundWords.join(", ")
         );
+    } else {
+        checks.push("✅ No common suspicious keywords detected");
     }
 
-    // Maximum score = 100
+    // URL length
+    if (url.length > 150) {
+        score += 10;
+        checks.push("⚠️ URL is unusually long");
+    } else {
+        checks.push("✅ URL length looks normal");
+    }
+
+    // @ symbol
+    if (url.includes("@")) {
+        score += 15;
+        checks.push("⚠️ URL contains '@' symbol");
+    } else {
+        checks.push("✅ No '@' symbol detected");
+    }
+
+    // Too many subdomains
+    const hostParts = parsedURL.hostname.split(".");
+
+    if (hostParts.length > 4) {
+        score += 10;
+        checks.push("⚠️ Many subdomains detected");
+    } else {
+        checks.push("✅ Domain structure looks normal");
+    }
+
     score = Math.min(score, 100);
 
-    let status;
+    let title;
+    let message;
 
-    if (score < 30) {
-
-        status = "🟢 Likely Safe";
-
-    } else if (score < 60) {
-
-        status = "🟡 Suspicious";
-
+    if (score <= 20) {
+        title = "🟢 Low Risk";
+        message =
+            "No major suspicious signs were detected. Still verify the website before entering sensitive information.";
+    } else if (score <= 50) {
+        title = "🟡 Medium Risk";
+        message =
+            "Some suspicious indicators were detected. Be careful before interacting with this website.";
     } else {
-
-        status = "🔴 High Risk";
+        title = "🔴 High Risk";
+        message =
+            "Several suspicious indicators were detected. Avoid entering passwords or sensitive information.";
     }
 
-    let reasonHTML = "";
+    showResult(title, score, message, checks);
+}
 
-    if (reasons.length === 0) {
 
-        reasonHTML =
-            "<p>No obvious suspicious signs detected.</p>";
+function showResult(title, score, message, checks) {
 
-    } else {
+    const result = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const riskScore = document.getElementById("riskScore");
+    const resultMessage = document.getElementById("resultMessage");
+    const checksBox = document.getElementById("checks");
 
-        reasonHTML = "<ul>";
+    result.classList.remove("hidden");
 
-        reasons.forEach(reason => {
+    resultTitle.textContent = title;
+    riskScore.textContent = score;
+    resultMessage.textContent = message;
 
-            reasonHTML +=
-                `<li>${reason}</li>`;
+    checksBox.innerHTML = "";
 
-        });
+    checks.forEach(function(check) {
 
-        reasonHTML += "</ul>";
-    }
+        const div = document.createElement("div");
 
-    result.innerHTML = `
-        <div class="result-box">
+        div.className = "check-item";
+        div.textContent = check;
 
-            <h2>${status}</h2>
+        checksBox.appendChild(div);
+    });
 
-            <h3>Risk Score: ${score}/100</h3>
-
-            ${reasonHTML}
-
-        </div>
-    `;
+    result.scrollIntoView({
+        behavior: "smooth"
+    });
 }
